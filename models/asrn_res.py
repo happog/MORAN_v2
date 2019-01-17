@@ -93,7 +93,10 @@ class Attention(nn.Module):
 
             num_steps = text_length.data.max()
             num_labels = text_length.data.sum()
-            targets = torch.zeros(nB, num_steps+1).long().cuda()
+            if torch.cuda.is_available():
+                targets = torch.zeros(nB, num_steps+1).long().cuda()
+            else:
+                targets = torch.zeros(nB, num_steps+1).long()
             start_id = 0
             for i in range(nB):
                 targets[i][1:1+text_length.data[i]] = text.data[start_id:start_id+text_length.data[i]]+1
@@ -139,8 +142,12 @@ class Attention(nn.Module):
 
             hidden = Variable(torch.zeros(nB,hidden_size).type_as(feats.data))
 
-            targets_temp = Variable(torch.zeros(nB).long().cuda().contiguous())
-            probs = Variable(torch.zeros(nB*num_steps, self.num_classes).cuda())
+            if torch.cuda.is_available():
+                targets_temp = Variable(torch.zeros(nB).long().cuda().contiguous())
+                probs = Variable(torch.zeros(nB*num_steps, self.num_classes).cuda())
+            else:
+                targets_temp = Variable(torch.zeros(nB).long().contiguous())
+                probs = Variable(torch.zeros(nB*num_steps, self.num_classes))
 
             for i in range(num_steps):
                 cur_embeddings = self.char_embeddings.index_select(0, targets_temp)

@@ -34,7 +34,11 @@ class MORN(nn.Module):
         grid = np.transpose(grid, (1, 0, 2))
         grid = np.expand_dims(grid, 0)
         grid = np.tile(grid, [maxBatch, 1, 1, 1])
-        grid = torch.from_numpy(grid).type(self.inputDataType).cuda()
+        if torch.cuda.is_available():
+            grid = torch.from_numpy(grid).type(self.inputDataType).cuda()
+        else:
+            self.inputDataType='torch.FloatTensor'
+            grid = torch.from_numpy(grid).type(self.inputDataType)
         self.grid = Variable(grid, requires_grad=False)
         self.grid_x = self.grid[:, :, :, 0].unsqueeze(3)
         self.grid_y = self.grid[:, :, :, 1].unsqueeze(3)

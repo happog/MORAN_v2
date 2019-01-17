@@ -42,7 +42,7 @@ class strLabelConverterForAttention(object):
                         file_out_of_list = open("out_of_list.txt", "a+")
                         file_out_of_list.write(chara + "\n")
                         file_out_of_list.close()
-                        print "\" %s \" is not in alphabet..." % chara
+                        print("\" %s \" is not in alphabet..." % chara)
                         continue
                 else:
                     text_result += chara
