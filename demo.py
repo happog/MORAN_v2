@@ -6,9 +6,10 @@ from PIL import Image
 from collections import OrderedDict
 import cv2
 from models.moran import MORAN
+import time
 
 model_path = './demo.pth'
-img_path = './demo/2.png'
+img_path = './demo/4.jpg'
 alphabet = '0:1:2:3:4:5:6:7:8:9:a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:v:w:x:y:z:$'
 
 moran = MORAN(1, len(alphabet.split(':')), 256, 32, 100, BidirDecoder=True, inputDataType='torch.FloatTensor')
@@ -31,6 +32,7 @@ for p in moran.parameters():
     p.requires_grad = False
 moran.eval()
 
+start = time.time()
 converter = utils.strLabelConverterForAttention(alphabet, ':')
 transformer = dataset.resizeNormalize((100, 32))
 image = Image.open(img_path).convert('L')
@@ -62,6 +64,8 @@ sim_preds = sim_preds.strip().split('$')[0]
 sim_preds_reverse = converter.decode(preds_reverse.data, length.data)
 sim_preds_reverse = sim_preds_reverse.strip().split('$')[0]
 
+stop = time.time()
+print('\nused time: {}'.format(stop-start))
 print('\nResult:\n' + 'Left to Right: ' + sim_preds + '\nRight to Left: ' + sim_preds_reverse + '\n\n')
 
 # cv2.imshow("demo", demo)
