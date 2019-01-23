@@ -15,8 +15,8 @@ class MORAN(nn.Module):
         if debug:
             x_rectified, demo = self.MORN(x, test, debug=debug)
             preds = self.ASRN(x_rectified, length, text, text_rev, test)
-            return preds, demo
+            return preds, x_rectified, demo
         else:
             x_rectified = self.MORN(x, test, debug=debug)
             preds = self.ASRN(x_rectified, length, text, text_rev, test)
-            return preds
+            return preds, x_rectified

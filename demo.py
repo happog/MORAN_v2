@@ -4,12 +4,13 @@ import tools.utils as utils
 import tools.dataset as dataset
 from PIL import Image
 from collections import OrderedDict
+import numpy as np
 import cv2
 from models.moran import MORAN
 import time
 
 model_path = './demo.pth'
-img_path = './demo/4.jpg'
+img_path = './demo/14.jpg'
 alphabet = '0:1:2:3:4:5:6:7:8:9:a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:v:w:x:y:z:$'
 
 moran = MORAN(1, len(alphabet.split(':')), 256, 32, 100, BidirDecoder=True, inputDataType='torch.FloatTensor')
@@ -52,9 +53,11 @@ t, l = converter.encode('0'*max_iter)
 utils.loadData(text, t)
 utils.loadData(length, l)
 output = moran(image, length, text, text, test=True, debug=True)
+# stop = time.time()
 
 preds, preds_reverse = output[0]
-demo = output[1]
+rectified = output[1][0].numpy().transpose([1, 2, 0]) # BCHW tensor to HWC array
+demo = output[2]
 
 _, preds = preds.max(1)
 _, preds_reverse = preds_reverse.max(1)
@@ -70,4 +73,5 @@ print('\nResult:\n' + 'Left to Right: ' + sim_preds + '\nRight to Left: ' + sim_
 
 # cv2.imshow("demo", demo)
 # cv2.waitKey()
-cv2.imwrite('demo/res.png', demo)
+cv2.imwrite('demo/res-demo.png', demo)
+cv2.imwrite('demo/res.png', (255*rectified).astype(dtype=np.uint8))
